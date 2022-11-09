@@ -81,7 +81,30 @@ CREATE TABLE IF NOT EXISTS class_registrations(
     FOREIGN KEY (student_id) REFERENCES students(student_id),
     FOREIGN KEY (grade_id) REFERENCES grades(grade_id)
 );
+
+DELIMITER $$ 
+CREATE FUNCTION convert_to_grade_point(letter_grade char(2)) 
+   RETURNS INT 
+   DETERMINISTIC 
+BEGIN 
+   DECLARE grade_point int;
+   
+	IF letter_grade = "A" THEN
+		SET grade_point = 4;
+	ELSEIF letter_grade = "B" THEN
+		SET grade_point = 3;
+	ELSEIF letter_grade = "C" THEN
+		SET grade_point = 2;
+	ELSEIF letter_grade = "D" THEN
+		SET grade_point = 1;
+	ELSEIF letter_grade = "F" THEN
+		SET grade_point = 0;
+	ELSE
+		SET grade_point = NULL;
+	END IF;
     
+    RETURN grade_point;
+END $$ 
     
 
 
