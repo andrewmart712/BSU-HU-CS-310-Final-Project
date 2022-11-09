@@ -1,5 +1,3 @@
-import com.mysql.jdbc.MySQLConnection;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +18,28 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	String sql = "SELECT"
+        			+ "	first_name, last_name, title, code, classes.name AS class_name, terms.name AS term\n"
+        			+ "FROM instructors\n"
+        			+ "JOIN academic_titles ON academic_titles.academic_title_id = instructors.academic_title_id\n"
+        			+ "JOIN class_sections ON class_sections.instructor_id = instructors.instructor_id\n"
+        			+ "JOIN classes ON classes.class_id = class_sections.class_id\n"
+        			+ "JOIN terms ON terms.term_id = class_sections.term_id\n"
+        			+ "WHERE instructors.instructor_id = " + first_name + " " + last_name + ";";
+            ResultSet resultSet = sqlStatement.executeQuery(sql);
+            
+            System.out.println("First Name | Last Name | Title | Code | Name | Term");
+            System.out.println("-".repeat(80));
+            
+            while (resultSet.next()) {
+                System.out.println(resultSet.getString(1) + " | "
+                        + resultSet.getString(2) + " | " + resultSet.getString(3)
+                        + " | " + resultSet.getString(4)
+                        + " | " + resultSet.getString(5)
+                        + " | " + resultSet.getString(6));
+            }
+
+            System.out.println("-".repeat(80));
             
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
@@ -154,8 +172,34 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = "SELECT"
+            		+ "	class_registrations.student_id, class_sections.class_section_id, first_name, last_name, code AS Code, classes.name AS Name, terms.name AS Term, letter_grade AS 'Letter Grade'\n"
+            		+ "FROM class_registrations\n"
+            		+ "JOIN class_sections ON class_sections.class_section_id = class_registrations.class_section_id\n"
+            		+ "JOIN students ON students.student_id = class_registrations.student_id\n"
+            		+ "JOIN terms ON terms.term_id = class_sections.term_id\n"
+            		+ "LEFT JOIN grades ON grades.grade_id = class_registrations.grade_id\n"
+            		+ "JOIN classes ON classes.class_id = class_sections.class_id;";
+            ResultSet resultSet = sqlStatement.executeQuery(sql);
+
+            System.out.println("Student ID | class_section_id | First Name | Last Name | Code | Name | Term | Letter Grade");
+            System.out.println("-".repeat(80));
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt(1) + " | "
+                        + resultSet.getInt(2) + " | " + resultSet.getString(3)
+                        + " | " + resultSet.getString(4)
+                        + " | " + resultSet.getString(5)
+                        + " | " + resultSet.getString(6)
+                        + " | " + resultSet.getString(7)
+                        + " | " + resultSet.getString(8));
+            }
+
+           System.out.println("-".repeat(80));
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
@@ -180,8 +224,27 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = "SELECT"
+            		+ "	class_section_id, code, classes.name, terms.name AS term\n"
+            		+ "FROM class_sections\n"
+            		+ "JOIN classes ON classes.class_id = class_sections.class_id\n"
+            		+ "JOIN terms ON terms.term_id = class_sections.term_id;;";
+            ResultSet resultSet = sqlStatement.executeQuery(sql);
+
+            System.out.println("Class Section ID | Code | Name | term");
+            System.out.println("-".repeat(80));
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt(1) + " | "
+                        + resultSet.getString(2) + " | " + resultSet.getString(3)
+                        + " | " + resultSet.getString(4));
+            }
+
+           System.out.println("-".repeat(80));
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
@@ -206,8 +269,23 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+        	connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = "SELECT * FROM classes;";
+            ResultSet resultSet = sqlStatement.executeQuery(sql);
+
+            System.out.println("Class ID | Code | Name | Description");
+            System.out.println("-".repeat(80));
+
+            while (resultSet.next()) {
+                System.out.println(resultSet.getInt(1) + " | "
+                        + resultSet.getString(2) + " | " + resultSet.getString(3)
+                        + " | " + resultSet.getString(4));
+            }
+
+           System.out.println("-".repeat(80));
+           
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
             System.out.println(sqlException.getMessage());
