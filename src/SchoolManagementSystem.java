@@ -1,3 +1,5 @@
+import com.mysql.jdbc.MySQLConnection;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -231,8 +233,23 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+             connection = Database.getDatabaseConnection();
+             sqlStatement = connection.createStatement();
+
+             String sql = "SELECT * FROM students;";
+             ResultSet resultSet = sqlStatement.executeQuery(sql);
+
+             System.out.println("Student ID | First Name | Last Name | Birthdate");
+             System.out.println("-".repeat(80));
+
+             while (resultSet.next()) {
+                 System.out.println(resultSet.getInt(1) + " | "
+                         + resultSet.getString(2) + " | " + resultSet.getString(3)
+                         + " | " + resultSet.getDate(4));
+             }
+
+            System.out.println("-".repeat(80));
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
             System.out.println(sqlException.getMessage());
