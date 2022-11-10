@@ -18,6 +18,9 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
+            connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
         	String sql = "SELECT"
         			+ "	first_name, last_name, title, code, classes.name AS class_name, terms.name AS term\n"
         			+ "FROM instructors\n"
@@ -25,7 +28,7 @@ public class SchoolManagementSystem {
         			+ "JOIN class_sections ON class_sections.instructor_id = instructors.instructor_id\n"
         			+ "JOIN classes ON classes.class_id = class_sections.class_id\n"
         			+ "JOIN terms ON terms.term_id = class_sections.term_id\n"
-        			+ "WHERE instructors.instructor_id = " + first_name + " " + last_name + ";";
+        			+ "WHERE instructors.first_name = " + "\"" + first_name + "\"" + ";";
             ResultSet resultSet = sqlStatement.executeQuery(sql);
             
             System.out.println("First Name | Last Name | Title | Code | Name | Term");
@@ -66,8 +69,20 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+            connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = String.format("UPDATE class_registrations SET class_registrations.grade_id = " +
+                    "(SELECT grades.grade_id FROM grades WHERE grades.letter_grade = '%s') " +
+                    "WHERE class_registrations.student_id = '%s' AND class_registrations.class_section_id = '%s'; ",
+                    grade, studentId, classSectionID);
+
+            sqlStatement.executeUpdate(sql);
+
+            ResultSet resultSet = sqlStatement.executeQuery("SELECT * FROM class_registrations");
+
+            System.out.println("Grade has been submitted!");
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to submit grade");
             System.out.println(sqlException.getMessage());
@@ -92,8 +107,27 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+            connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = String.format("INSERT INTO class_registrations (student_id, class_section_id) " +
+                            "VALUES ('%s', '%s');",
+                    studentId,
+                    classSectionID);
+            sqlStatement.executeUpdate(sql);
+
+            ResultSet resultSet = sqlStatement.executeQuery("SELECT * FROM class_registrations");
+
+            System.out.println("Class Registration ID | Student ID | Class Section ID");
+
+            while (resultSet.next()) {
+                if (resultSet.getString(2).equals(classSectionID)
+                        && resultSet.getString(3).equals(studentId)) {
+                    System.out.println(resultSet.getString(1) + " | "
+                            + resultSet.getString(3) + " | " + resultSet.getString(2));
+                }
+            }
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to register student");
             System.out.println(sqlException.getMessage());
@@ -118,8 +152,15 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+             connection = Database.getDatabaseConnection();
+             sqlStatement = connection.createStatement();
+
+             String sql = String.format("DELETE FROM students WHERE student_id = %s;", studentId);
+
+             sqlStatement.executeUpdate(sql);
+
+             System.out.println("Student with id: " + studentId + " was deleted");
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to delete student");
             System.out.println(sqlException.getMessage());
@@ -145,8 +186,29 @@ public class SchoolManagementSystem {
         Statement sqlStatement = null;
 
         try {
-             /* Your logic goes here */
-            throw new SQLException(); // REMOVE THIS (this is just to force it to compile)
+            connection = Database.getDatabaseConnection();
+            sqlStatement = connection.createStatement();
+
+            String sql = String.format("INSERT INTO students (first_name, last_name, birthdate) " +
+                    "VALUES ('%s', '%s', '%s');",
+                        firstName,
+                        lastName,
+                        birthdate);
+            sqlStatement.executeUpdate(sql);
+
+            ResultSet resultSet = sqlStatement.executeQuery("SELECT * FROM students");
+
+            System.out.println("Student ID | First Name | Last Name | Birthdate");
+
+            while (resultSet.next()) {
+                if (resultSet.getString(2).equals(firstName)
+                        && resultSet.getString(3).equals(lastName)) {
+                    System.out.println(resultSet.getInt(1) + " | "
+                            + resultSet.getString(2) + " | " + resultSet.getString(3)
+                            + " | " + resultSet.getDate(4));
+                }
+            }
+
         } catch (SQLException sqlException) {
             System.out.println("Failed to create student");
             System.out.println(sqlException.getMessage());
@@ -198,8 +260,6 @@ public class SchoolManagementSystem {
                         + " | " + resultSet.getString(8));
             }
 
-           System.out.println("-".repeat(80));
-
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
@@ -243,8 +303,6 @@ public class SchoolManagementSystem {
                         + " | " + resultSet.getString(4));
             }
 
-           System.out.println("-".repeat(80));
-
         } catch (SQLException sqlException) {
             System.out.println("Failed to get class sections");
             System.out.println(sqlException.getMessage());
@@ -283,8 +341,6 @@ public class SchoolManagementSystem {
                         + resultSet.getString(2) + " | " + resultSet.getString(3)
                         + " | " + resultSet.getString(4));
             }
-
-           System.out.println("-".repeat(80));
            
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
@@ -325,8 +381,6 @@ public class SchoolManagementSystem {
                          + resultSet.getString(2) + " | " + resultSet.getString(3)
                          + " | " + resultSet.getDate(4));
              }
-
-            System.out.println("-".repeat(80));
 
         } catch (SQLException sqlException) {
             System.out.println("Failed to get students");
